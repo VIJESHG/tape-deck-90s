@@ -32,54 +32,54 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   };
 
   return (
-    <header className="relative z-20 border-b border-[#3a2d24] bg-[#1a1410]/90 backdrop-blur-md px-4 py-3 shadow-xl">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Neon / Amber Retro Shop Sign */}
+    <header className="relative z-20 border-b-2 border-[#2b211a] bg-[#120e0b] px-4 py-2.5 shadow-md">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+        {/* Retro Shop Signboard Plate */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#2a1e16] border border-[#d97706]/40 flex items-center justify-center shadow-[0_0_15px_rgba(217,119,6,0.25)] text-[#f59e0b]">
-            <Disc className="w-6 h-6 animate-spin [animation-duration:8s]" />
+          <div className="w-9 h-9 rounded bg-[#1f1712] border border-[#3d2e23] flex items-center justify-center text-[#d97706] shadow-inner">
+            <Disc className="w-5 h-5 animate-spin [animation-duration:10s]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl md:text-2xl font-bold tracking-wider text-[#f3e8dc] font-typewriter uppercase">
+              <h1 className="text-lg md:text-xl font-bold tracking-wider text-[#e2d5c8] font-typewriter uppercase">
                 90s Cassette Shop <span className="text-[#d97706]">&amp;</span> Radio
               </h1>
-              <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono-tech bg-[#d97706]/20 border border-[#d97706]/40 text-[#f59e0b] rounded uppercase">
+              <span className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-mono-tech bg-[#241a12] border border-[#4a3627] text-[#c29873] rounded uppercase">
                 EST. 1992
               </span>
             </div>
-            <p className="text-xs text-[#a8988a] font-mono-tech flex items-center gap-1">
+            <p className="text-[11px] text-[#8c7a6b] font-mono-tech flex items-center gap-1">
               <Radio className="w-3 h-3 text-[#d97706]" />
-              Mixtape Counter &amp; Shortwave Receiver • T-Series • Vividh Bharati 89.1 FM
+              Mixtape Counter &amp; Shortwave Receiver • Vividh Bharati 89.1 FM
             </p>
           </div>
         </div>
 
         {/* Action Controls & Atmosphere Toggles */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Create Custom Mixtape Button */}
           <button
             onClick={() => {
               audioEngine.playButtonSnap();
               onOpenMixtapeMaker();
             }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#d97706] hover:bg-[#b45309] text-black font-semibold text-xs transition-all shadow-[0_0_10px_rgba(217,119,6,0.3)] active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#b45309] hover:bg-[#d97706] text-black font-extrabold text-xs font-mono-tech uppercase tracking-wider transition-all active:scale-95 cursor-pointer shadow-sm border border-amber-300"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Make Custom Mixtape</span>
+            <span>Record Mixtape</span>
           </button>
 
           {/* Tape Hiss Noise Generator Toggle */}
           <button
             onClick={toggleHiss}
             title="Toggle authentic magnetic tape hiss noise"
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-mono-tech border transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono-tech uppercase border transition-all cursor-pointer ${
               playback.tapeHissEnabled
-                ? 'bg-[#2a1e16] border-[#d97706] text-[#f59e0b] shadow-[0_0_8px_rgba(217,119,6,0.3)]'
-                : 'bg-[#15110e] border-[#3a2d24] text-[#8c7a6b] hover:text-[#c4b5fd]'
+                ? 'bg-[#2a1c12] border-[#d97706] text-[#f59e0b]'
+                : 'bg-[#18120e] border-[#2e231b] text-[#8c7a6b] hover:text-[#d4c1a5]'
             }`}
           >
-            {playback.tapeHissEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            {playback.tapeHissEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#f59e0b]" /> : <VolumeX className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">Tape Hiss</span>
           </button>
 
@@ -87,9 +87,9 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
           <button
             onClick={toggleLighting}
             title="Cycle shop lighting (Dim / Cozy Amber / Bright)"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#15110e] border border-[#3a2d24] text-[#a8988a] hover:text-[#f3e8dc] text-xs font-mono-tech transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-[#18120e] border border-[#2e231b] text-[#8c7a6b] hover:text-[#e2d5c8] text-xs font-mono-tech uppercase transition-all cursor-pointer"
           >
-            <Sun className="w-3.5 h-3.5 text-[#f59e0b]" />
+            <Sun className="w-3.5 h-3.5 text-[#d97706]" />
             <span className="capitalize">{playback.ambientLighting}</span>
           </button>
         </div>

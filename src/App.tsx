@@ -154,6 +154,7 @@ export default function App() {
             }}
             onNextTrack={handleNext}
             onPrevTrack={handlePrev}
+            onFlipSide={() => setSeekTargetTime(0)}
           />
         ) : (
           <RadioConsole

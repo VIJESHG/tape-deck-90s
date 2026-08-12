@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Square, FastForward, Rewind, ArrowUp, Sparkles, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, Square, FastForward, Rewind, ArrowUp, Sparkles, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 import { CassetteTape, PlaybackState } from '../types';
 import { audioEngine } from '../lib/audioEngine';
 import { getYouTubeThumbnailUrl } from './YouTubeAudioBackend';
+
+import cassetteAmberImg from '../assets/images/vintage_cassette_shell_amber_1786569287884.jpg';
+import cassetteDarkImg from '../assets/images/vintage_cassette_shell_dark_1786569303742.jpg';
+import cassetteRedImg from '../assets/images/vintage_cassette_shell_red_1786569318702.jpg';
+import cassetteBlueImg from '../assets/images/vintage_cassette_shell_blue_1786569334437.jpg';
+
+export const getRealisticCassetteImage = (tape: CassetteTape) => {
+  if (tape.shellColor === 'red' || tape.genre === '90s Romance') {
+    return cassetteRedImg;
+  }
+  if (tape.shellColor === 'black' || tape.genre === 'Bollywood Gold') {
+    return cassetteDarkImg;
+  }
+  if (tape.shellColor === 'blue' || tape.genre === 'Indipop' || tape.genre === 'Western Hits') {
+    return cassetteBlueImg;
+  }
+  return cassetteAmberImg;
+};
 
 interface CassetteDeckConsoleProps {
   currentTape: CassetteTape | null;
@@ -16,6 +34,7 @@ interface CassetteDeckConsoleProps {
   onRewind: () => void;
   onNextTrack?: () => void;
   onPrevTrack?: () => void;
+  onFlipSide?: (newSide: 'A' | 'B') => void;
 }
 
 export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
@@ -30,11 +49,34 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
   onRewind,
   onNextTrack,
   onPrevTrack,
+  onFlipSide,
 }) => {
   const [pencilSpinning, setPencilSpinning] = useState(false);
   const [pencilTooltip, setPencilTooltip] = useState(false);
   const [isDoorOpen, setIsDoorOpen] = useState(false);
   const [isInserting, setIsInserting] = useState(false);
+  const [currentSide, setCurrentSide] = useState<'A' | 'B'>('A');
+  const [isFlipping, setIsFlipping] = useState(false);
+
+  // Reset side to A when cassette changes
+  useEffect(() => {
+    if (currentTape) {
+      setCurrentSide('A');
+    }
+  }, [currentTape?.id]);
+
+  const handleFlipSide = () => {
+    audioEngine.playSwitchClick();
+    setIsFlipping(true);
+    const nextSide = currentSide === 'A' ? 'B' : 'A';
+    setCurrentSide(nextSide);
+    setTimeout(() => {
+      setIsFlipping(false);
+    }, 450);
+    if (onFlipSide) {
+      onFlipSide(nextSide);
+    }
+  };
 
   const activeVideoId = activeTrackInfo?.videoId;
   const thumbnailUrl = currentTape ? getYouTubeThumbnailUrl(currentTape.youtubeId, activeVideoId) : null;
@@ -192,26 +234,26 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto my-6 p-4 sm:p-6 rounded-3xl shop-counter-desk border-4 border-[#3d2e23] shadow-[0_30px_90px_rgba(0,0,0,0.95)]">
+    <div className="relative w-full max-w-6xl mx-auto my-6 p-4 sm:p-6 rounded-2xl shop-counter-desk border-4 border-t-[#523e30] border-l-[#3a2a1d] border-r-[#1e150f] border-b-[#0e0905] shadow-[0_35px_90px_rgba(0,0,0,0.98)]">
       {/* Heavy Brushed Metal Main Hi-Fi Deck Chassis */}
-      <div className="relative w-full rounded-2xl chassis-brushed-metal p-5 sm:p-7 text-[#e8dfd8]">
+      <div className="relative w-full rounded-xl chassis-brushed-metal p-5 sm:p-7 text-[#e8dfd8]">
         
-        {/* Corner Metallic Screw Heads */}
-        <div className="absolute top-3 left-3 w-3 h-3 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-sm">
-          <div className="w-2 h-0.5 bg-stone-900 rotate-45" />
+        {/* Corner Metallic Screw Heads in Recessed Sockets */}
+        <div className="absolute top-3 left-3 w-3.5 h-3.5 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="w-2.5 h-0.5 bg-stone-900 rotate-45" />
         </div>
-        <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-sm">
-          <div className="w-2 h-0.5 bg-stone-900 -rotate-45" />
+        <div className="absolute top-3 right-3 w-3.5 h-3.5 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="w-2.5 h-0.5 bg-stone-900 -rotate-45" />
         </div>
-        <div className="absolute bottom-3 left-3 w-3 h-3 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-sm">
-          <div className="w-2 h-0.5 bg-stone-900 rotate-12" />
+        <div className="absolute bottom-3 left-3 w-3.5 h-3.5 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="w-2.5 h-0.5 bg-stone-900 rotate-12" />
         </div>
-        <div className="absolute bottom-3 right-3 w-3 h-3 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-sm">
-          <div className="w-2 h-0.5 bg-stone-900 -rotate-30" />
+        <div className="absolute bottom-3 right-3 w-3.5 h-3.5 rounded-full bg-stone-700 border border-stone-500 flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]">
+          <div className="w-2.5 h-0.5 bg-stone-900 -rotate-30" />
         </div>
 
         {/* Top Brushed Aluminum Faceplate Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-5 border-b-2 border-[#4a3b30] gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-5 border-b-2 border-[#3d2f25] gap-3">
           <div className="flex items-center gap-3">
             {/* T-Series Metallic Badge */}
             <div className="px-3.5 py-1 rounded bg-gradient-to-r from-[#d97706] via-[#f59e0b] to-[#b45309] text-black font-extrabold text-xs tracking-wider uppercase shadow-md flex items-center gap-1.5 font-mono-tech border border-amber-300">
@@ -219,10 +261,10 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
               <span>Super Cassettes • T-Series</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-mono-tech text-[#f3e8dc] font-extrabold tracking-wider">
+              <span className="text-sm sm:text-base font-mono-tech text-[#f3e8dc] font-extrabold tracking-wider">
                 MODEL CT-909 STEREO CASSETTE DECK
               </span>
-              <span className="text-[10px] font-mono-tech text-[#a8988a]">
+              <span className="text-[10px] font-mono-tech text-[#a8988a] font-bold">
                 3-HEAD SYSTEM • DIRECT DRIVE • HIGH BIAS TYPE II
               </span>
             </div>
@@ -244,10 +286,10 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
           
           {/* Left Side: Recessed Plastic Glass Cassette Window & Chamber (7 Cols) */}
           <div className="md:col-span-7 flex flex-col justify-between">
-            <div className="relative w-full h-full bg-gradient-to-b from-[#0a0806] to-[#15100c] p-4 sm:p-5 rounded-2xl border-2 border-[#3d2f25] shadow-[inset_0_0_20px_rgba(0,0,0,0.95)]">
+            <div className="relative w-full h-full bg-[#0a0806] p-4 sm:p-5 rounded-xl border border-[#2b2018] shadow-[inset_0_3px_15px_rgba(0,0,0,0.95)]">
               
               {/* Recessed Glass Door with Tilt Animation & Incandescent Backlight */}
-              <div className={`relative w-full h-56 sm:h-60 rounded-xl bg-[#080605] border-2 border-[#4a392c] p-4 flex flex-col justify-between overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.95)] transition-all duration-300 ${
+              <div className={`relative w-full h-56 sm:h-60 rounded-lg bg-[#060504] border-2 border-[#3d2f25] p-4 flex flex-col justify-between overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.95)] transition-all duration-300 ${
                 isDoorOpen ? 'door-open border-amber-500/80 shadow-[0_0_30px_rgba(245,158,11,0.3)]' : ''
               }`}>
                 {/* Diagonal Glass Sheen Reflection Overlay */}
@@ -264,109 +306,193 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
                     <span className={`w-2.5 h-2.5 rounded-full ${
                       playback.isPlaying ? 'bg-[#10b981] animate-pulse shadow-[0_0_8px_#10b981]' : 'bg-red-800'
                     }`} />
-                    {currentTape ? currentTape.brand : 'NO CASSETTE INSERTED'}
+                    {currentTape ? `${currentTape.brand} [SIDE ${currentSide}]` : 'NO CASSETTE INSERTED'}
                   </span>
 
-                  {/* 7-Segment Digital LED Timer */}
-                  <div className="px-3 py-1 rounded bg-[#070504] border border-[#d97706]/70 text-[#f59e0b] font-mono-tech font-bold text-xs tracking-widest shadow-[inset_0_0_8px_rgba(0,0,0,0.9),0_0_12px_rgba(245,158,11,0.3)]">
-                    ⏱️ {formatDigitalTime(playback.currentTime)}
+                  <div className="flex items-center gap-2">
+                    {/* FLIP SIDE BUTTON in Chamber Header */}
+                    <button
+                      onClick={handleFlipSide}
+                      className="px-2.5 py-1 rounded bg-[#18120d] hover:bg-[#281d14] border border-[#d97706] text-[#f59e0b] font-mono-tech font-extrabold text-[10px] tracking-wider uppercase shadow-md active:translate-y-0.5 transition-all flex items-center gap-1.5 cursor-pointer"
+                      title="Flip Cassette Tape to Side B / Side A"
+                    >
+                      <RotateCcw className={`w-3.5 h-3.5 text-[#d97706] ${isFlipping ? 'animate-spin' : ''}`} />
+                      <span>FLIP SIDE ({currentSide})</span>
+                    </button>
+
+                    {/* 7-Segment Digital LED Timer */}
+                    <div className="px-3 py-1 rounded bg-[#070504] border border-[#d97706]/70 text-[#f59e0b] font-mono-tech font-bold text-xs tracking-widest shadow-[inset_0_0_8px_rgba(0,0,0,0.9),0_0_12px_rgba(245,158,11,0.3)]">
+                      ⏱️ {formatDigitalTime(playback.currentTime)}
+                    </div>
                   </div>
                 </div>
 
                 {/* Physical Cassette Tape Shell with Reels & Adhesive Label */}
                 {currentTape ? (
-                  <div className={`relative w-full h-36 my-auto rounded-xl p-3.5 border-2 shadow-2xl flex items-center justify-between transition-all z-10 ${
+                  <div className={`relative w-full h-[155px] sm:h-[162px] my-auto rounded-lg p-2 transition-all z-10 flex flex-col justify-between overflow-hidden shadow-[0_12px_28px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.22),inset_0_-2px_4px_rgba(0,0,0,0.8)] ${
                     isInserting ? 'animate-cassette-insert' : ''
                   } ${
-                    currentTape.shellColor === 'gold' ? 'bg-[#3e2c1c] border-[#d97706]/80' :
-                    currentTape.shellColor === 'red' ? 'bg-[#3b1717] border-red-800/80' :
-                    currentTape.shellColor === 'blue' ? 'bg-[#1a2536] border-blue-800/80' :
-                    currentTape.shellColor === 'black' ? 'bg-[#1a1a1a] border-gray-700' :
-                    'bg-white/10 border-white/20 backdrop-blur-sm'
+                    isFlipping ? 'animate-tape-flip' : ''
+                  } ${
+                    currentTape.shellColor === 'gold' ? 'bg-[#2d2015] border-2 border-[#543b27] border-t-[#785338] border-b-[#140d07]' :
+                    currentTape.shellColor === 'red' ? 'bg-[#291212] border-2 border-[#4f2020] border-t-[#733030] border-b-[#120707]' :
+                    currentTape.shellColor === 'blue' ? 'bg-[#121c29] border-2 border-[#223348] border-t-[#324a6a] border-b-[#0a0f17]' :
+                    currentTape.shellColor === 'black' ? 'bg-[#181818] border-2 border-[#333333] border-t-[#4a4a4a] border-b-[#0c0c0c]' :
+                    'bg-[#202020]/90 border-2 border-[#404040]'
                   }`}>
-                    {/* Corner Screw Highlights */}
-                    <div className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600" />
-                    <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600" />
-                    <div className="absolute bottom-1 left-1 w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600" />
-                    <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600" />
+                    {/* Photorealistic Cassette Photo Shell Background Texture */}
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-screen pointer-events-none z-0 rounded-lg scale-105"
+                      style={{ backgroundImage: `url(${getRealisticCassetteImage(currentTape)})` }}
+                    />
+                    {/* Top Tactile Grip Ribs & Molded Shell Markings */}
+                    <div className="w-full flex items-center justify-between px-3 text-[7px] font-mono-tech font-extrabold text-white/30 tracking-widest uppercase select-none border-b border-white/10 pb-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-amber-500/90 font-bold">[ SIDE {currentSide} ]</span>
+                        <span className="hidden sm:inline text-white/20">HIGH BIAS TYPE II</span>
+                      </div>
+                      {/* Top Molded Plastic Ribs */}
+                      <div className="flex gap-1 items-center opacity-30">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                          <div key={i} className="w-1 h-1 bg-white rounded-full" />
+                        ))}
+                      </div>
+                      <div>C-90 HIGH BIAS</div>
+                    </div>
 
-                    {/* Tape Spool Left */}
-                    <div className="relative flex items-center justify-center w-24 h-24 bg-[#120e0b] rounded-full border-2 border-amber-900/70 shadow-inner overflow-hidden">
-                      {/* Magnetic Tape Wound Circle */}
-                      <div
-                        className="absolute rounded-full bg-gradient-to-r from-[#2b1f17] to-[#17100b] border border-[#4a392c] transition-all duration-300"
-                        style={{ width: `${leftSpoolRadius * 2}px`, height: `${leftSpoolRadius * 2}px` }}
-                      />
-                      {/* White Plastic Gear Reel */}
-                      <div className={`relative z-10 w-11 h-11 rounded-full bg-stone-200 border-2 border-stone-400 flex items-center justify-center shadow-md ${
-                        (playback.isPlaying || pencilSpinning) ? 'spin-reel' :
-                        playback.isFastForwarding ? 'spin-reel-fast' :
-                        playback.isRewinding ? 'spin-reel-reverse' : ''
-                      }`}>
-                        <div className="w-3.5 h-3.5 bg-stone-900 rounded-full border border-stone-500" />
-                        <div className="absolute w-full h-1 bg-stone-400" />
-                        <div className="absolute w-1 h-full bg-stone-400" />
+                    {/* Corner & Center Counter-Sunk Screw Holes */}
+                    <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-[#0a0806] shadow-[inset_0_1px_2px_rgba(0,0,0,0.9)] border border-white/10 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 relative flex items-center justify-center">
+                        <div className="w-1 h-0.5 bg-stone-900 rotate-45" />
+                      </div>
+                    </div>
+                    <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#0a0806] shadow-[inset_0_1px_2px_rgba(0,0,0,0.9)] border border-white/10 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 relative flex items-center justify-center">
+                        <div className="w-1 h-0.5 bg-stone-900 -rotate-45" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-[#0a0806] shadow-[inset_0_1px_2px_rgba(0,0,0,0.9)] border border-white/10 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 relative flex items-center justify-center">
+                        <div className="w-1 h-0.5 bg-stone-900 rotate-12" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-[#0a0806] shadow-[inset_0_1px_2px_rgba(0,0,0,0.9)] border border-white/10 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 relative flex items-center justify-center">
+                        <div className="w-1 h-0.5 bg-stone-900 -rotate-30" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#0a0806] shadow-[inset_0_1px_2px_rgba(0,0,0,0.9)] border border-white/10 flex items-center justify-center z-10">
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 relative flex items-center justify-center">
+                        <div className="w-1 h-0.5 bg-stone-900 rotate-90" />
                       </div>
                     </div>
 
-                    {/* Center Textured Adhesive Sticker Label */}
-                    <div className="flex-1 mx-2 sm:mx-3 h-16 bg-[#f7eedc] rounded-lg border border-[#d4c1a5] p-1.5 flex items-center gap-2 relative shadow-md overflow-hidden text-stone-900">
-                      {thumbnailUrl ? (
-                        <>
-                          <div className="relative w-14 h-12 rounded bg-black overflow-hidden border border-[#b89f80] shrink-0 shadow-sm">
-                            <img
-                              src={thumbnailUrl}
-                              alt={activeTrackInfo?.title || currentTape.title}
-                              className="w-full h-full object-cover"
+                    {/* Central Tape Window Bay for Spools & Adhesive Paper Label */}
+                    <div className="relative w-full h-[105px] bg-[#070504] rounded border border-[#000000a0] p-1.5 flex items-center justify-between shadow-[inset_0_3px_10px_rgba(0,0,0,0.98)] overflow-hidden my-0.5">
+                      {/* Window Sheen Highlight */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none z-20" />
+
+                      {/* Tape Spool Left */}
+                      <div className="relative flex items-center justify-center w-22 h-22 sm:w-24 sm:h-24 bg-[#0a0806] rounded-full border border-stone-800 shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)] overflow-hidden shrink-0">
+                        {/* Dark Brown Magnetic Tape Pack Circle */}
+                        <div
+                          className="absolute rounded-full bg-gradient-to-r from-[#21150e] via-[#3a281b] to-[#17100b] border border-[#4a392c] transition-all duration-300 shadow-md"
+                          style={{ width: `${leftSpoolRadius * 2}px`, height: `${leftSpoolRadius * 2}px` }}
+                        />
+                        {/* Authentic 6-Spoke White Plastic Reel Hub */}
+                        <div className={`relative z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#f8f3e6] border-2 border-[#d6cbaf] flex items-center justify-center shadow-md ${
+                          (playback.isPlaying || pencilSpinning) ? 'spin-reel' :
+                          playback.isFastForwarding ? 'spin-reel-fast' :
+                          playback.isRewinding ? 'spin-reel-reverse' : ''
+                        }`}>
+                          {[0, 60, 120, 180, 240, 300].map(deg => (
+                            <div
+                              key={deg}
+                              className="absolute w-1 h-3.5 bg-[#8c7a6b] rounded-xs"
+                              style={{ transform: `rotate(${deg}deg) translateY(-8px)` }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                          ))}
+                          <div className="w-3.5 h-3.5 bg-[#0a0806] rounded-full border border-stone-500 z-10 shadow-inner" />
+                        </div>
+                      </div>
+
+                      {/* Authentic Warm Aged Paper Adhesive Sticker Label */}
+                      <div className="flex-1 mx-1.5 sm:mx-2.5 h-[84px] bg-[#f8f4ea] rounded border border-[#cbba9f] p-1.5 flex flex-col justify-between relative shadow-md overflow-hidden text-stone-900 rotate-[-0.2deg] z-10">
+                        {/* Classic Printed Color Stripe Header */}
+                        <div className="w-full flex items-center justify-between text-[8px] font-mono-tech font-bold border-b border-stone-400 pb-0.5 leading-none">
+                          <div className="flex items-center gap-1.5 text-[#b45309] truncate max-w-[120px] font-extrabold uppercase">
+                            <span className="px-1 py-0.2 bg-[#3d2b20] text-amber-300 rounded-[2px] text-[7px] font-extrabold">SIDE {currentSide}</span>
+                            <span>{currentTape.brand}</span>
                           </div>
-                          <div className="min-w-0 flex-1 flex flex-col justify-between h-full py-0.5">
-                            <div className="w-full flex items-center justify-between text-[9px] font-mono-tech font-extrabold border-b border-stone-400 pb-0.5 leading-none">
-                              <span className="text-[#b45309] truncate max-w-[110px] font-bold">
-                                {activeTrackInfo?.author || currentTape.brand}
-                              </span>
-                              <span className="text-stone-700 font-mono-tech text-[8px]">
-                                {activeTrackInfo?.isPlaylist ? `TRK ${(activeTrackInfo.index || 0) + 1}/${activeTrackInfo.total || 1}` : 'YOUTUBE AUDIO'}
-                              </span>
+                          <span className="text-stone-700 font-extrabold tracking-wider text-[7.5px] uppercase">
+                            C-90 HIGH BIAS
+                          </span>
+                        </div>
+
+                        {/* Label Body: Thumbnail / Handwritten Title & Track */}
+                        <div className="flex items-center gap-2 my-0.5 min-w-0 flex-1">
+                          {thumbnailUrl ? (
+                            <div className="relative w-12 h-10 sm:w-14 sm:h-11 rounded bg-black overflow-hidden border border-[#b89f80] shrink-0 shadow-sm rotate-[-1deg]">
+                              <img
+                                src={thumbnailUrl}
+                                alt={activeTrackInfo?.title || currentTape.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                             </div>
-                            <div className="font-handwritten text-xs sm:text-sm font-bold text-[#1f1208] truncate">
+                          ) : null}
+
+                          <div className="min-w-0 flex-1 flex flex-col justify-center">
+                            <div className="font-handwritten text-xs sm:text-sm font-extrabold text-[#1a120b] truncate leading-tight">
                               {activeTrackInfo?.title || currentTape.title}
                             </div>
-                            <div className="w-full h-1 bg-gradient-to-r from-[#3d2b20] via-[#5c4233] to-[#3d2b20] shadow-inner rounded-xs" />
+                            <div className="text-[9px] font-handwritten text-blue-900/80 truncate font-semibold">
+                              {activeTrackInfo?.author || currentTape.artist}
+                            </div>
+                            {/* Handwritten Pen Write-in Line Accent */}
+                            <div className="w-full border-b border-dashed border-stone-400/80 mt-0.5" />
                           </div>
-                        </>
-                      ) : (
-                        <div className="w-full h-full flex flex-col justify-between">
-                          <div className="w-full flex items-center justify-between text-[10px] font-mono-tech font-extrabold border-b border-stone-400 pb-0.5">
-                            <span className="text-amber-800">{currentTape.brand}</span>
-                            <span className="text-stone-700">C-90 HIGH BIAS</span>
-                          </div>
-                          <div className="font-handwritten text-base font-bold text-[#1f1208] truncate max-w-full">
-                            {currentTape.title}
-                          </div>
-                          <div className="w-full h-2 bg-gradient-to-r from-[#3d2b20] via-[#5c4233] to-[#3d2b20] shadow-inner rounded-xs" />
                         </div>
-                      )}
+
+                        {/* Footer Fine Print & Tape Formula */}
+                        <div className="w-full flex items-center justify-between text-[6.5px] font-mono-tech text-stone-600 font-bold border-t border-stone-300 pt-0.5 leading-none uppercase tracking-tighter">
+                          <span>HIGH DENSITY • COMPACT CASSETTE</span>
+                          <span>{activeTrackInfo?.isPlaylist ? `TRK ${(activeTrackInfo.index || 0) + 1}/${activeTrackInfo.total || 1}` : 'STEREO'}</span>
+                        </div>
+                      </div>
+
+                      {/* Tape Spool Right */}
+                      <div className="relative flex items-center justify-center w-22 h-22 sm:w-24 sm:h-24 bg-[#0a0806] rounded-full border border-stone-800 shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)] overflow-hidden shrink-0">
+                        {/* Dark Brown Magnetic Tape Pack Circle */}
+                        <div
+                          className="absolute rounded-full bg-gradient-to-r from-[#21150e] via-[#3a281b] to-[#17100b] border border-[#4a392c] transition-all duration-300 shadow-md"
+                          style={{ width: `${rightSpoolRadius * 2}px`, height: `${rightSpoolRadius * 2}px` }}
+                        />
+                        {/* Authentic 6-Spoke White Plastic Reel Hub */}
+                        <div className={`relative z-10 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#f8f3e6] border-2 border-[#d6cbaf] flex items-center justify-center shadow-md ${
+                          (playback.isPlaying || pencilSpinning) ? 'spin-reel' :
+                          playback.isFastForwarding ? 'spin-reel-fast' :
+                          playback.isRewinding ? 'spin-reel-reverse' : ''
+                        }`}>
+                          {[0, 60, 120, 180, 240, 300].map(deg => (
+                            <div
+                              key={deg}
+                              className="absolute w-1 h-3.5 bg-[#8c7a6b] rounded-xs"
+                              style={{ transform: `rotate(${deg}deg) translateY(-8px)` }}
+                            />
+                          ))}
+                          <div className="w-3.5 h-3.5 bg-[#0a0806] rounded-full border border-stone-500 z-10 shadow-inner" />
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Tape Spool Right */}
-                    <div className="relative flex items-center justify-center w-24 h-24 bg-[#120e0b] rounded-full border-2 border-amber-900/70 shadow-inner overflow-hidden">
-                      {/* Magnetic Tape Wound Circle */}
-                      <div
-                        className="absolute rounded-full bg-gradient-to-r from-[#2b1f17] to-[#17100b] border border-[#4a392c] transition-all duration-300"
-                        style={{ width: `${rightSpoolRadius * 2}px`, height: `${rightSpoolRadius * 2}px` }}
-                      />
-                      {/* White Plastic Gear Reel */}
-                      <div className={`relative z-10 w-11 h-11 rounded-full bg-stone-200 border-2 border-stone-400 flex items-center justify-center shadow-md ${
-                        (playback.isPlaying || pencilSpinning) ? 'spin-reel' :
-                        playback.isFastForwarding ? 'spin-reel-fast' :
-                        playback.isRewinding ? 'spin-reel-reverse' : ''
-                      }`}>
-                        <div className="w-3.5 h-3.5 bg-stone-900 rounded-full border border-stone-500" />
-                        <div className="absolute w-full h-1 bg-stone-400" />
-                        <div className="absolute w-1 h-full bg-stone-400" />
-                      </div>
+                    {/* Bottom Molded Trapezoid Head Bay & Exposed Tape Strand */}
+                    <div className="w-[62%] h-4 mx-auto bg-[#140e0a] border-t border-white/10 rounded-b shadow-inner relative flex items-center justify-between px-2 overflow-hidden">
+                      {/* Exposed Magnetic Tape Strand running horizontally across head bay */}
+                      <div className="absolute inset-x-2 h-2 bg-gradient-to-r from-[#21140a] via-[#3b2513] to-[#21140a] border-y border-[#4a331e] shadow-inner" />
+                      {/* Guide Pins / Rollers */}
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 z-10 shadow-sm" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-stone-400 border border-stone-600 z-10 shadow-sm" />
                     </div>
                   </div>
                 ) : (
@@ -530,7 +656,24 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
               </div>
 
               {/* Interactive Retro Audio Enhancer Controls */}
-              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#2b2018]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-[#2b2018]">
+                {/* Flip Side Button */}
+                <button
+                  onClick={handleFlipSide}
+                  className={`p-1.5 rounded-lg border text-[9px] font-mono-tech font-extrabold flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-sm ${
+                    currentSide === 'B'
+                      ? 'bg-[#d97706]/30 border-[#f59e0b] text-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]'
+                      : 'bg-[#18120d] border-[#3d2f25] text-[#8c7a6b] hover:text-[#d4c1a5]'
+                  }`}
+                  title="Toggle Side A / Side B"
+                >
+                  <span className="flex items-center gap-1">
+                    <RotateCcw className={`w-3 h-3 ${currentSide === 'B' ? 'text-[#f59e0b]' : 'text-[#8c7a6b]'}`} />
+                    FLIP SIDE
+                  </span>
+                  <span className="text-[8px] opacity-80 uppercase">SIDE {currentSide} ACTIVE</span>
+                </button>
+
                 {/* Dynamic Bass Boost */}
                 <button
                   onClick={toggleBassBoost}
@@ -583,8 +726,37 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
 
             {/* Authentic Unfolded Paper J-Card Tracklist Liner */}
             <div className="relative p-4 rounded-xl jcard-paper-liner text-[#2e1f14] shadow-2xl transform rotate-1 border-2 border-[#d4c1a5]">
-              <div className="absolute top-2 right-2 text-[9px] font-mono-tech text-[#8c6b4f] uppercase tracking-widest font-extrabold border-b border-[#8c6b4f]">
-                J-CARD PAPER LINER
+              <div className="flex items-center justify-between border-b border-[#8c6b4f] pb-1.5 mb-1.5">
+                <div className="text-[9px] font-mono-tech text-[#8c6b4f] uppercase tracking-widest font-extrabold">
+                  J-CARD PAPER LINER
+                </div>
+                {/* Side A / Side B Toggle Buttons on J-Card */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      if (currentSide !== 'A') handleFlipSide();
+                    }}
+                    className={`px-2 py-0.5 text-[8.5px] font-mono-tech font-extrabold rounded cursor-pointer transition-all border ${
+                      currentSide === 'A'
+                        ? 'bg-[#d97706] text-black border-amber-300 shadow-xs'
+                        : 'bg-[#e5d8c3] text-[#705238] border-[#c4b197] hover:bg-[#d8c8b0]'
+                    }`}
+                  >
+                    SIDE A
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (currentSide !== 'B') handleFlipSide();
+                    }}
+                    className={`px-2 py-0.5 text-[8.5px] font-mono-tech font-extrabold rounded cursor-pointer transition-all border ${
+                      currentSide === 'B'
+                        ? 'bg-[#d97706] text-black border-amber-300 shadow-xs'
+                        : 'bg-[#e5d8c3] text-[#705238] border-[#c4b197] hover:bg-[#d8c8b0]'
+                    }`}
+                  >
+                    SIDE B
+                  </button>
+                </div>
               </div>
 
               <div className="font-handwritten text-2xl font-bold text-[#1f1208] mb-0.5 leading-tight truncate">
@@ -603,7 +775,7 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="text-[10px] font-mono-tech text-[#8c6b4f] font-bold uppercase flex items-center justify-between">
-                      <span>▶ NOW PLAYING AUDIO TRACK</span>
+                      <span>▶ NOW PLAYING [SIDE {currentSide}]</span>
                       {activeTrackInfo.isPlaylist && (
                         <span className="bg-[#d97706] text-black px-1 rounded text-[9px] font-extrabold ml-1">
                           TRK {(activeTrackInfo.index || 0) + 1}/{activeTrackInfo.total || 1}
@@ -625,9 +797,11 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
               {/* Handwritten Tracklist */}
               <div className="border-t border-b border-[#d4be9c] py-2 my-1.5 font-handwritten text-base space-y-1 text-[#22140a] max-h-24 overflow-y-auto">
                 {currentTape ? (
-                  currentTape.sideA.map((track, index) => (
+                  (currentSide === 'A' ? currentTape.sideA : currentTape.sideB).map((track, index) => (
                     <div key={index} className="flex items-center gap-1.5">
-                      <span className="text-xs text-[#8c6b4f] font-mono-tech font-bold">{index + 1}.</span>
+                      <span className="text-xs text-[#8c6b4f] font-mono-tech font-bold">
+                        {currentSide === 'A' ? index + 1 : index + 1 + currentTape.sideA.length}.
+                      </span>
                       <span>{track}</span>
                     </div>
                   ))
@@ -653,7 +827,7 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
             <span className="text-amber-500">• LATCH MECHANISM</span>
           </div>
 
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 sm:gap-2.5 w-full max-w-4xl">
+          <div className="grid grid-cols-3 sm:grid-cols-9 gap-2 sm:gap-2.5 w-full max-w-5xl">
             {/* EJECT */}
             <button
               onClick={handleEjectKey}
@@ -664,6 +838,18 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
             >
               <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#d97706] mb-1" />
               <span className="text-[9px] sm:text-[10px] font-mono-tech font-extrabold uppercase tracking-wider">EJECT</span>
+            </button>
+
+            {/* FLIP SIDE */}
+            <button
+              onClick={handleFlipSide}
+              className={`piano-key-btn py-3 sm:py-4 rounded-xl flex flex-col items-center justify-center cursor-pointer ${
+                currentSide === 'B' ? 'piano-key-pressed text-amber-300 border-amber-400' : 'text-[#d4c3b5]'
+              }`}
+              title="Flip Cassette Tape (Side A / B)"
+            >
+              <RotateCcw className={`w-4 h-4 sm:w-5 sm:h-5 text-amber-500 mb-1 ${isFlipping ? 'animate-spin' : ''}`} />
+              <span className="text-[9px] sm:text-[10px] font-mono-tech font-extrabold uppercase tracking-wider">FLIP ({currentSide})</span>
             </button>
 
             {/* PREV SONG */}
