@@ -1,0 +1,6 @@
+{
+  "name": "90s Cassette Shop & Vintage Radio",
+  "description": "An interactive 1990s mixtape counter and shortwave radio experience with physical cassette spools, analog tuning dial, Web Audio mechanical sound effects, and curated nostalgic music.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
