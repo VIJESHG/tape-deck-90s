@@ -3,6 +3,7 @@ import { Play, Pause, Square, FastForward, Rewind, ArrowUp, Sparkles, SkipBack, 
 import { CassetteTape, PlaybackState } from '../types';
 import { audioEngine } from '../lib/audioEngine';
 import { getYouTubeThumbnailUrl } from './YouTubeAudioBackend';
+import { DeskStickyNotesBar } from './DeskStickyNotes';
 
 import cassetteAmberImg from '../assets/images/vintage_cassette_shell_amber_1786569287884.jpg';
 import cassetteDarkImg from '../assets/images/vintage_cassette_shell_dark_1786569303742.jpg';
@@ -235,6 +236,9 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
 
   return (
     <div className="relative w-full max-w-6xl mx-auto my-6 p-4 sm:p-6 rounded-2xl shop-counter-desk border-4 border-t-[#523e30] border-l-[#3a2a1d] border-r-[#1e150f] border-b-[#0e0905] shadow-[0_35px_90px_rgba(0,0,0,0.98)]">
+      {/* Compact Top Desk Sticky Notes Pinned on Wooden Counter */}
+      <DeskStickyNotesBar />
+
       {/* Heavy Brushed Metal Main Hi-Fi Deck Chassis */}
       <div className="relative w-full rounded-xl chassis-brushed-metal p-5 sm:p-7 text-[#e8dfd8]">
         
@@ -515,306 +519,122 @@ export const CassetteDeckConsole: React.FC<CassetteDeckConsoleProps> = ({
             </div>
           </div>
 
-          {/* Right Side: Dual Illuminated Analog VU Meters & Paper J-Card Liner (5 Cols) */}
-          <div className="md:col-span-5 flex flex-col gap-4 justify-between">
+          {/* Right Side: Dual Illuminated Analog VU Meters & Pinned Paper Tracklist Note (5 Cols) */}
+          <div className="md:col-span-5 flex flex-col justify-between gap-3">
             
-            {/* Illuminated Fluorescent VFD Digital Spectrum Analyzer & Audio Synthesizer */}
-            <div className="p-3.5 rounded-2xl bg-[#090705] border-2 border-[#3d2f25] shadow-[inset_0_0_18px_rgba(0,0,0,0.95)] flex flex-col justify-between gap-3">
-              {/* VFD Header */}
-              <div className="flex items-center justify-between text-[10px] font-mono-tech text-[#a8988a] font-bold tracking-wider uppercase border-b border-[#2b2018] pb-1.5">
-                <div className="flex items-center gap-1.5 text-[#f59e0b]">
-                  <Sparkles className="w-3.5 h-3.5 animate-spin [animation-duration:6s]" />
-                  <span>VFD DIGITAL SPECTRUM & EQ</span>
-                </div>
-                {/* Visualizer Mode Switcher */}
-                <div className="flex items-center gap-1 bg-[#18120d] p-0.5 rounded-md border border-[#3d2f25] text-[9px]">
-                  {(['SPECTRUM', 'WAVEFORM', 'MATRIX'] as const).map(mode => (
-                    <button
-                      key={mode}
-                      onClick={() => {
-                        audioEngine.playSwitchClick();
-                        setVisualizerMode(mode);
-                      }}
-                      className={`px-1.5 py-0.5 rounded transition-all font-mono-tech font-extrabold cursor-pointer ${
-                        visualizerMode === mode
-                          ? 'bg-[#d97706] text-black shadow-sm'
-                          : 'text-[#8c7a6b] hover:text-[#f59e0b]'
-                      }`}
-                    >
-                      {mode}
-                    </button>
-                  ))}
-                </div>
+            {/* Dual Illuminated Analog Peak Level VU Meters Box */}
+            <div className="p-3 rounded-xl bg-[#0d0a08] border-2 border-[#3d2f25] shadow-[inset_0_0_15px_rgba(0,0,0,0.95)] flex flex-col gap-2">
+              <div className="flex items-center justify-between text-[9px] font-mono-tech text-[#a8988a] font-black tracking-widest uppercase border-b border-[#2b2018] pb-1">
+                <span>ANALOG PEAK LEVEL</span>
+                <span className="text-amber-500">STEREO L • R</span>
               </div>
 
-              {/* Glowing Vacuum Fluorescent Display Glass Screen */}
-              <div className="relative h-28 rounded-xl bg-[#030d08] border-2 border-[#052e16] p-2.5 shadow-[inset_0_0_12px_rgba(16,185,129,0.2)] flex flex-col justify-between overflow-hidden">
-                {/* Scanline Overlay */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none opacity-40" />
-
-                {/* Top Status Bar in Glass */}
-                <div className="flex items-center justify-between text-[9px] font-mono-tech text-[#10b981] font-extrabold z-10 leading-none">
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${playback.isPlaying && !playback.isPaused ? 'bg-[#10b981] animate-ping' : 'bg-[#064e3b]'}`} />
-                      {playback.isPlaying && !playback.isPaused ? 'ANALYZING HIGH-BIAS' : 'STANDBY'}
-                    </span>
-                    <span className="text-[#047857]">|</span>
-                    <span className="text-[#34d399]">TYPE-II CHROME</span>
+              {/* Dual Meters Frame */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* LEFT VU METER */}
+                <div className="relative h-20 rounded bg-[#f5ebd7] border-2 border-[#1f160e] p-1.5 flex flex-col justify-between overflow-hidden shadow-inner">
+                  <div className="text-[7.5px] font-mono-tech font-bold text-stone-700 flex justify-between">
+                    <span>-20 -10 -5 -3 0 +3 +5</span>
+                    <span className="text-red-700 font-extrabold">VU</span>
                   </div>
-                  <div className="text-[#f59e0b] font-mono-tech">
-                    {formatDigitalTime(playback.currentTime)}
+
+                  {/* Arc scale marking */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 60">
+                    <path d="M 15 45 A 35 35 0 0 1 85 45" stroke="#444" strokeWidth="1" fill="none" strokeDasharray="1 2" />
+                    <line x1="75" y1="20" x2="82" y2="22" stroke="#dc2626" strokeWidth="1.5" />
+                  </svg>
+
+                  {/* Needle */}
+                  <div
+                    className="absolute bottom-1 left-1/2 w-0.5 h-12 bg-red-600 origin-bottom transition-transform duration-100 ease-out z-10"
+                    style={{
+                      transform: `translateX(-50%) rotate(${
+                        playback.isPlaying && !playback.isPaused
+                          ? -15 + Math.sin(Date.now() / 150) * 20 + Math.random() * 10
+                          : -40
+                      }deg)`
+                    }}
+                  />
+
+                  <div className="z-10 text-[8px] font-mono-tech font-extrabold text-stone-800 text-center uppercase mt-auto">
+                    VU
                   </div>
                 </div>
 
-                {/* Display Body: Spectrum Bars / Waveform / Matrix */}
-                <div className="relative h-16 flex items-end justify-between gap-1 z-10 px-1 my-1">
-                  {visualizerMode === 'SPECTRUM' && (
-                    <div className="w-full h-full flex items-end justify-between gap-1">
-                      {vfdLevels.map((val, i) => (
-                        <div key={i} className="flex-1 h-full flex flex-col justify-end gap-0.5">
-                          {/* Segmented fluorescent LED bar */}
-                          {Array.from({ length: 8 }).map((_, segIdx) => {
-                            const segThreshold = (8 - segIdx) * 12.5;
-                            const isActive = val >= segThreshold;
-                            const isPeakRed = segIdx <= 1; // Top 2 segments are red
-                            const isMidAmber = segIdx > 1 && segIdx <= 3;
+                {/* RIGHT VU METER */}
+                <div className="relative h-20 rounded bg-[#f5ebd7] border-2 border-[#1f160e] p-1.5 flex flex-col justify-between overflow-hidden shadow-inner">
+                  <div className="text-[7.5px] font-mono-tech font-bold text-stone-700 flex justify-between">
+                    <span>-20 -10 -5 -3 0 +3 +5</span>
+                    <span className="text-red-700 font-extrabold">VU</span>
+                  </div>
 
-                            return (
-                              <div
-                                key={segIdx}
-                                className={`w-full h-1.5 rounded-xs transition-all duration-75 ${
-                                  isActive
-                                    ? isPeakRed
-                                      ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]'
-                                      : isMidAmber
-                                      ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.7)]'
-                                      : 'bg-[#10b981] shadow-[0_0_5px_rgba(16,185,129,0.7)]'
-                                    : 'bg-[#064e3b]/30'
-                                }`}
-                              />
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {/* Arc scale marking */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 60">
+                    <path d="M 15 45 A 35 35 0 0 1 85 45" stroke="#444" strokeWidth="1" fill="none" strokeDasharray="1 2" />
+                    <line x1="75" y1="20" x2="82" y2="22" stroke="#dc2626" strokeWidth="1.5" />
+                  </svg>
 
-                  {visualizerMode === 'WAVEFORM' && (
-                    <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-                      <svg className="w-full h-full" viewBox="0 0 200 50">
-                        <path
-                          d={
-                            playback.isPlaying && !playback.isPaused
-                              ? `M 0 25 Q 25 ${25 - (vfdLevels[0] || 0) * 0.25}, 50 25 T 100 ${25 + (vfdLevels[4] || 0) * 0.25} T 150 25 T 200 25`
-                              : 'M 0 25 L 200 25'
-                          }
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="2"
-                          className="transition-all duration-75"
-                        />
-                      </svg>
-                    </div>
-                  )}
+                  {/* Needle */}
+                  <div
+                    className="absolute bottom-1 left-1/2 w-0.5 h-12 bg-red-600 origin-bottom transition-transform duration-100 ease-out z-10"
+                    style={{
+                      transform: `translateX(-50%) rotate(${
+                        playback.isPlaying && !playback.isPaused
+                          ? -12 + Math.cos(Date.now() / 140) * 18 + Math.random() * 8
+                          : -40
+                      }deg)`
+                    }}
+                  />
 
-                  {visualizerMode === 'MATRIX' && (
-                    <div className="w-full h-full grid grid-cols-12 gap-1 items-center">
-                      {vfdLevels.map((val, i) => (
-                        <div key={i} className="flex flex-col gap-1 items-center">
-                          {Array.from({ length: 4 }).map((_, dotIdx) => {
-                            const active = val > dotIdx * 25;
-                            return (
-                              <div
-                                key={dotIdx}
-                                className={`w-2 h-2 rounded-full transition-all duration-75 ${
-                                  active
-                                    ? dotIdx === 0
-                                      ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.9)]'
-                                      : 'bg-[#f59e0b] shadow-[0_0_6px_rgba(245,158,11,0.8)]'
-                                    : 'bg-[#064e3b]/30'
-                                }`}
-                              />
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="z-10 text-[8px] font-mono-tech font-extrabold text-stone-800 text-center uppercase mt-auto">
+                    VU
+                  </div>
                 </div>
-
-                {/* Glass Bottom Frequency Labels */}
-                <div className="flex items-center justify-between text-[7px] font-mono-tech text-[#047857] font-bold z-10 uppercase">
-                  <span>60Hz</span>
-                  <span>150Hz</span>
-                  <span>400Hz</span>
-                  <span>1kHz</span>
-                  <span>2.5kHz</span>
-                  <span>6kHz</span>
-                  <span>15kHz</span>
-                </div>
-              </div>
-
-              {/* Interactive Retro Audio Enhancer Controls */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-[#2b2018]">
-                {/* Flip Side Button */}
-                <button
-                  onClick={handleFlipSide}
-                  className={`p-1.5 rounded-lg border text-[9px] font-mono-tech font-extrabold flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-sm ${
-                    currentSide === 'B'
-                      ? 'bg-[#d97706]/30 border-[#f59e0b] text-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)]'
-                      : 'bg-[#18120d] border-[#3d2f25] text-[#8c7a6b] hover:text-[#d4c1a5]'
-                  }`}
-                  title="Toggle Side A / Side B"
-                >
-                  <span className="flex items-center gap-1">
-                    <RotateCcw className={`w-3 h-3 ${currentSide === 'B' ? 'text-[#f59e0b]' : 'text-[#8c7a6b]'}`} />
-                    FLIP SIDE
-                  </span>
-                  <span className="text-[8px] opacity-80 uppercase">SIDE {currentSide} ACTIVE</span>
-                </button>
-
-                {/* Dynamic Bass Boost */}
-                <button
-                  onClick={toggleBassBoost}
-                  className={`p-1.5 rounded-lg border text-[9px] font-mono-tech font-extrabold flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-sm ${
-                    isBassBoost
-                      ? 'bg-[#d97706]/20 border-[#f59e0b] text-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.3)]'
-                      : 'bg-[#18120d] border-[#3d2f25] text-[#8c7a6b] hover:text-[#d4c1a5]'
-                  }`}
-                >
-                  <span className="flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isBassBoost ? 'bg-[#f59e0b]' : 'bg-[#3d2f25]'}`} />
-                    BASS BOOST
-                  </span>
-                  <span className="text-[8px] opacity-80">+6dB LOW EQ</span>
-                </button>
-
-                {/* Analog Tape Hiss */}
-                <button
-                  onClick={toggleTapeHiss}
-                  className={`p-1.5 rounded-lg border text-[9px] font-mono-tech font-extrabold flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-sm ${
-                    isTapeHiss
-                      ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] shadow-[0_0_8px_rgba(16,185,129,0.3)]'
-                      : 'bg-[#18120d] border-[#3d2f25] text-[#8c7a6b] hover:text-[#d4c1a5]'
-                  }`}
-                >
-                  <span className="flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isTapeHiss ? 'bg-[#10b981]' : 'bg-[#3d2f25]'}`} />
-                    TAPE HISS
-                  </span>
-                  <span className="text-[8px] opacity-80">ANALOG WARMTH</span>
-                </button>
-
-                {/* Dolby NR */}
-                <button
-                  onClick={toggleDolbyNR}
-                  className={`p-1.5 rounded-lg border text-[9px] font-mono-tech font-extrabold flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-all shadow-sm ${
-                    isDolbyNR
-                      ? 'bg-[#3b82f6]/20 border-[#3b82f6] text-[#60a5fa] shadow-[0_0_8px_rgba(59,130,246,0.3)]'
-                      : 'bg-[#18120d] border-[#3d2f25] text-[#8c7a6b] hover:text-[#d4c1a5]'
-                  }`}
-                >
-                  <span className="flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isDolbyNR ? 'bg-[#60a5fa]' : 'bg-[#3d2f25]'}`} />
-                    DOLBY B-NR
-                  </span>
-                  <span className="text-[8px] opacity-80">NOISE REDUCTION</span>
-                </button>
               </div>
             </div>
 
-            {/* Authentic Unfolded Paper J-Card Tracklist Liner */}
-            <div className="relative p-4 rounded-xl jcard-paper-liner text-[#2e1f14] shadow-2xl transform rotate-1 border-2 border-[#d4c1a5]">
-              <div className="flex items-center justify-between border-b border-[#8c6b4f] pb-1.5 mb-1.5">
-                <div className="text-[9px] font-mono-tech text-[#8c6b4f] uppercase tracking-widest font-extrabold">
-                  J-CARD PAPER LINER
-                </div>
-                {/* Side A / Side B Toggle Buttons on J-Card */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => {
-                      if (currentSide !== 'A') handleFlipSide();
-                    }}
-                    className={`px-2 py-0.5 text-[8.5px] font-mono-tech font-extrabold rounded cursor-pointer transition-all border ${
-                      currentSide === 'A'
-                        ? 'bg-[#d97706] text-black border-amber-300 shadow-xs'
-                        : 'bg-[#e5d8c3] text-[#705238] border-[#c4b197] hover:bg-[#d8c8b0]'
-                    }`}
-                  >
-                    SIDE A
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (currentSide !== 'B') handleFlipSide();
-                    }}
-                    className={`px-2 py-0.5 text-[8.5px] font-mono-tech font-extrabold rounded cursor-pointer transition-all border ${
-                      currentSide === 'B'
-                        ? 'bg-[#d97706] text-black border-amber-300 shadow-xs'
-                        : 'bg-[#e5d8c3] text-[#705238] border-[#c4b197] hover:bg-[#d8c8b0]'
-                    }`}
-                  >
-                    SIDE B
-                  </button>
-                </div>
+            {/* Pinned Paper J-Card Tracklist Note */}
+            <div className="relative p-3.5 rounded-lg bg-[#fbf8f1] text-[#1c130b] shadow-2xl border border-[#d6cebe] rotate-[0.8deg] flex flex-col justify-between min-h-[160px]">
+              {/* Yellow Tape Strips on Corners */}
+              <div className="absolute -top-2 left-4 w-10 h-4 bg-[#fef08a]/80 border border-[#eab308]/40 rotate-[-6deg] shadow-xs" />
+              <div className="absolute -top-2 right-4 w-10 h-4 bg-[#fef08a]/80 border border-[#eab308]/40 rotate-[8deg] shadow-xs" />
+
+              {/* Note Title */}
+              <div className="border-b border-stone-300 pb-1 mb-1.5 flex items-center justify-between">
+                <h4 className="font-handwritten text-sm sm:text-base font-extrabold text-[#1a0f07] leading-tight truncate">
+                  {currentTape ? currentTape.title : 'Kumar & Alka: 90s Romance Collection'}
+                </h4>
+                <span className="text-[9px] font-mono-tech font-bold text-red-600">99.5</span>
               </div>
 
-              <div className="font-handwritten text-2xl font-bold text-[#1f1208] mb-0.5 leading-tight truncate">
-                {currentTape ? currentTape.title : 'My 90s Mixtape'}
-              </div>
-              <div className="text-xs font-typewriter text-[#523d2b] mb-1 font-bold truncate">
-                Artist: {currentTape ? currentTape.artist : 'Select a cassette from shelf'}
-              </div>
-
-              {activeTrackInfo && activeTrackInfo.title && (
-                <div className="my-1.5 p-2 rounded bg-[#3a2517]/10 border border-[#8c6b4f]/30 flex items-center gap-2.5">
-                  {thumbnailUrl && (
-                    <div className="relative w-12 h-12 rounded bg-black overflow-hidden border border-[#8c6b4f] shrink-0 shadow-sm">
-                      <img src={thumbnailUrl} alt={activeTrackInfo.title} className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[10px] font-mono-tech text-[#8c6b4f] font-bold uppercase flex items-center justify-between">
-                      <span>▶ NOW PLAYING [SIDE {currentSide}]</span>
-                      {activeTrackInfo.isPlaylist && (
-                        <span className="bg-[#d97706] text-black px-1 rounded text-[9px] font-extrabold ml-1">
-                          TRK {(activeTrackInfo.index || 0) + 1}/{activeTrackInfo.total || 1}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-sm font-handwritten font-bold text-[#d97706] truncate mt-0.5">
-                      {activeTrackInfo.title}
-                    </div>
-                    {activeTrackInfo.author && (
-                      <div className="text-[11px] font-typewriter text-[#523d2b] truncate">
-                        By {activeTrackInfo.author}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Handwritten Tracklist */}
-              <div className="border-t border-b border-[#d4be9c] py-2 my-1.5 font-handwritten text-base space-y-1 text-[#22140a] max-h-24 overflow-y-auto">
+              {/* Handwritten Tracklist Items */}
+              <ol className="font-handwritten text-xs sm:text-sm text-[#1e3a8a] space-y-1 font-bold my-1">
                 {currentTape ? (
-                  (currentSide === 'A' ? currentTape.sideA : currentTape.sideB).map((track, index) => (
-                    <div key={index} className="flex items-center gap-1.5">
-                      <span className="text-xs text-[#8c6b4f] font-mono-tech font-bold">
-                        {currentSide === 'A' ? index + 1 : index + 1 + currentTape.sideA.length}.
-                      </span>
-                      <span>{track}</span>
-                    </div>
+                  (currentSide === 'A' ? currentTape.sideA : currentTape.sideB).slice(0, 4).map((track, idx) => (
+                    <li key={idx} className="truncate">
+                      <span className="text-stone-500 font-mono-tech text-[10px] mr-1">{idx + 1}.</span>
+                      {track}
+                    </li>
                   ))
                 ) : (
-                  <div className="text-sm italic text-[#8c6b4f]">
-                    No tape inserted. Pick a cassette below!
-                  </div>
+                  <>
+                    <li><span className="text-stone-500 font-mono-tech text-[10px] mr-1">1.</span> Mera Dil Bhi Kitna Pagal Hai</li>
+                    <li><span className="text-stone-500 font-mono-tech text-[10px] mr-1">2.</span> Sochenge Tumhe Pyaar Karein</li>
+                    <li><span className="text-stone-500 font-mono-tech text-[10px] mr-1">3.</span> Tumhein Dekhein Meri Aankhein</li>
+                    <li><span className="text-stone-500 font-mono-tech text-[10px] mr-1">4.</span> Kitna Pyaara Tujhe Rab Ne Banaya</li>
+                  </>
                 )}
-              </div>
+              </ol>
 
-              <div className="text-xs font-handwritten italic text-[#4a3423] mt-1 flex items-start gap-1">
-                <span className="font-bold">Note:</span>
-                <span>"{currentTape?.notes || 'Recorded off Vividh Bharati 90s FM!'}"</span>
+              {/* Bottom Note & Blue C-90 Badge */}
+              <div className="pt-1.5 border-t border-dashed border-stone-300 flex items-end justify-between text-[9px] font-handwritten text-stone-600">
+                <div className="leading-tight max-w-[170px] italic">
+                  Recorded with T-Series Gold C-90 tape from Vishal Bhandari.
+                </div>
+
+                <div className="px-2 py-0.5 rounded bg-[#0284c7] text-white font-mono-tech font-black text-[10px] uppercase shadow-xs">
+                  C-90
+                </div>
               </div>
             </div>
           </div>

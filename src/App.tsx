@@ -11,13 +11,16 @@ import { ModeSelectorSwitch } from './components/ModeSelectorSwitch';
 import { CassetteDeckConsole } from './components/CassetteDeckConsole';
 import { RadioConsole } from './components/RadioConsole';
 import { CassetteRack } from './components/CassetteRack';
+import { CassetteWallFullView } from './components/CassetteWallFullView';
 import { RotatingTicker } from './components/RotatingTicker';
 import { MixtapeMakerModal } from './components/MixtapeMakerModal';
 import { FixedPlayerBar } from './components/FixedPlayerBar';
+import { FooterDisclaimer } from './components/FooterDisclaimer';
 import { YouTubeAudioBackend } from './components/YouTubeAudioBackend';
 import { audioEngine } from './lib/audioEngine';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<string>('DECK');
   const [mode, setMode] = useState<AudioMode>('CASSETTE');
   const [tapes, setTapes] = useState<CassetteTape[]>(INITIAL_CASSETTES);
   const [currentTape, setCurrentTape] = useState<CassetteTape | null>(INITIAL_CASSETTES[0]);
@@ -65,6 +68,15 @@ export default function App() {
     setActiveTrackInfo(null);
     setSeekTargetTime(null);
     setPlayback(prev => ({ ...prev, isPlaying: true, currentTime: 0 }));
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === 'RADIO') {
+      setMode('RADIO');
+    } else if (tab === 'DECK') {
+      setMode('CASSETTE');
+    }
   };
 
   // Next / Prev track (Handles both YouTube playlists and Cassette rack items)
@@ -118,66 +130,127 @@ export default function App() {
       <HeaderBar
         playback={playback}
         setPlayback={setPlayback}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         onOpenMixtapeMaker={() => setIsMixtapeModalOpen(true)}
       />
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 py-6 relative z-10">
-        {/* Mode Selector Switch */}
-        <ModeSelectorSwitch
-          mode={mode}
-          onModeChange={newMode => setMode(newMode)}
-        />
-
-        {/* Central Dual-Mode Audio Console */}
-        {mode === 'CASSETTE' ? (
-          <CassetteDeckConsole
-            currentTape={currentTape}
-            playback={playback}
-            activeTrackInfo={activeTrackInfo}
-            onPlay={() => setPlayback(p => ({ ...p, isPlaying: true }))}
-            onPause={() => setPlayback(p => ({ ...p, isPlaying: false }))}
-            onStop={() => setPlayback(p => ({ ...p, isPlaying: false, currentTime: 0 }))}
-            onEject={() => {
-              setCurrentTape(null);
-              setPlayback(p => ({ ...p, isPlaying: false }));
+        {activeTab === 'CASSETTE WALL' ? (
+          /* Full 90s Cassette Wall Display View Matching Reference Image */
+          <CassetteWallFullView
+            tapes={tapes}
+            currentTapeId={currentTape?.id || null}
+            onSelectTape={tape => {
+              setMode('CASSETTE');
+              handleSelectTape(tape);
             }}
-            onFastForward={() => {
-              const target = Math.min(playback.duration || 240, playback.currentTime + 15);
-              setSeekTargetTime(target);
-              setPlayback(p => ({ ...p, currentTime: target }));
-            }}
-            onRewind={() => {
-              const target = Math.max(0, playback.currentTime - 15);
-              setSeekTargetTime(target);
-              setPlayback(p => ({ ...p, currentTime: target }));
-            }}
-            onNextTrack={handleNext}
-            onPrevTrack={handlePrev}
-            onFlipSide={() => setSeekTargetTime(0)}
+            onOpenMixtapeMaker={() => setIsMixtapeModalOpen(true)}
           />
+        ) : activeTab === 'SHOP MEMORIES' ? (
+          /* Shop Memories Dedicated View */
+          <div className="max-w-4xl mx-auto my-6 p-6 rounded-2xl bg-[#ebd2b2] text-[#2b1d14] border-4 border-[#3d2a1d] shadow-2xl">
+            <h2 className="text-2xl font-mono-tech font-extrabold uppercase mb-2 text-[#1a0e05]">
+              📻 90s CASSETTE SHOP MEMORIES &amp; ANNOUNCEMENTS
+            </h2>
+            <p className="text-sm font-typewriter text-[#5c4028] mb-6">
+              Recollections and listener request logs from 1990 to 1999.
+            </p>
+            <div className="space-y-4">
+              {SHOP_MEMORIES.map(mem => (
+                <div key={mem.id} className="p-4 rounded-lg bg-[#fdfbf7] border border-[#c9b49b] shadow-sm">
+                  <div className="flex justify-between items-center text-xs font-mono-tech font-bold text-[#8c6b4f] mb-1">
+                    <span>{mem.speaker}</span>
+                    <span className="bg-[#ebd2b2] px-2 py-0.5 rounded border border-[#c9b49b]">{mem.year}</span>
+                  </div>
+                  <p className="font-handwritten text-lg font-bold text-[#1a0e05]">"{mem.quote}"</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : activeTab === 'ABOUT' ? (
+          /* About Retro Shop View */
+          <div className="max-w-3xl mx-auto my-6 p-6 rounded-2xl bg-[#f8f4ea] text-[#1c120a] border-4 border-[#3a271a] shadow-2xl font-typewriter">
+            <h2 className="text-2xl font-mono-tech font-extrabold uppercase mb-3 text-[#1a0e05]">
+              📼 ABOUT THE 90s CASSETTE SHOP
+            </h2>
+            <p className="text-sm leading-relaxed mb-4">
+              Welcome to the 90s Cassette Shop! Step back in time to the golden era of magnetic audio tapes, Hi-Fi stereo decks, shortwave radio broadcasts, and handmade mixtapes.
+            </p>
+            <p className="text-sm leading-relaxed mb-4">
+              Browse our 6-column Cassette Wall stocked with classic Romance, Indipop, Bollywood Gold, Ghazals, Western Hits, and Custom Mixtapes. Insert any tape into the Model CT-989 Hi-Fi Deck to hear authentic tape noise, mechanical button clicks, and vintage analog sound.
+            </p>
+            <div className="p-3 rounded bg-[#fef08a] border border-[#eab308] font-handwritten text-lg font-bold text-red-800">
+              "Good music never gets old. Every tape has a story." ♡
+            </div>
+          </div>
         ) : (
-          <RadioConsole
-            stations={RADIO_STATIONS}
-            currentStation={currentStation}
-            playback={playback}
-            onSelectStation={handleSelectStation}
-          />
+          /* Default DECK / RADIO Main Console View */
+          <>
+            {/* Mode Selector Switch */}
+            <ModeSelectorSwitch
+              mode={mode}
+              onModeChange={newMode => {
+                setMode(newMode);
+                setActiveTab(newMode === 'CASSETTE' ? 'DECK' : 'RADIO');
+              }}
+            />
+
+            {/* Central Dual-Mode Audio Console */}
+            {mode === 'CASSETTE' ? (
+              <CassetteDeckConsole
+                currentTape={currentTape}
+                playback={playback}
+                activeTrackInfo={activeTrackInfo}
+                onPlay={() => setPlayback(p => ({ ...p, isPlaying: true }))}
+                onPause={() => setPlayback(p => ({ ...p, isPlaying: false }))}
+                onStop={() => setPlayback(p => ({ ...p, isPlaying: false, currentTime: 0 }))}
+                onEject={() => {
+                  setCurrentTape(null);
+                  setPlayback(p => ({ ...p, isPlaying: false }));
+                }}
+                onFastForward={() => {
+                  const target = Math.min(playback.duration || 240, playback.currentTime + 15);
+                  setSeekTargetTime(target);
+                  setPlayback(p => ({ ...p, currentTime: target }));
+                }}
+                onRewind={() => {
+                  const target = Math.max(0, playback.currentTime - 15);
+                  setSeekTargetTime(target);
+                  setPlayback(p => ({ ...p, currentTime: target }));
+                }}
+                onNextTrack={handleNext}
+                onPrevTrack={handlePrev}
+                onFlipSide={() => setSeekTargetTime(0)}
+              />
+            ) : (
+              <RadioConsole
+                stations={RADIO_STATIONS}
+                currentStation={currentStation}
+                playback={playback}
+                onSelectStation={handleSelectStation}
+              />
+            )}
+
+            {/* Rotating Memories & Radio Announcements Ticker */}
+            <RotatingTicker memories={SHOP_MEMORIES} />
+
+            {/* 90s Cassette Wall & Mixtape Shelves */}
+            <CassetteRack
+              tapes={tapes}
+              currentTapeId={currentTape?.id || null}
+              onSelectTape={tape => {
+                setMode('CASSETTE');
+                handleSelectTape(tape);
+              }}
+              onOpenMixtapeMaker={() => setIsMixtapeModalOpen(true)}
+            />
+          </>
         )}
 
-        {/* Rotating Memories & Radio Announcements Ticker */}
-        <RotatingTicker memories={SHOP_MEMORIES} />
-
-        {/* 90s Cassette Wall & Mixtape Shelves */}
-        <CassetteRack
-          tapes={tapes}
-          currentTapeId={currentTape?.id || null}
-          onSelectTape={tape => {
-            setMode('CASSETTE');
-            handleSelectTape(tape);
-          }}
-          onOpenMixtapeMaker={() => setIsMixtapeModalOpen(true)}
-        />
+        {/* Footer Disclaimer & Contact Info */}
+        <FooterDisclaimer />
       </main>
 
       {/* Fixed Bottom Glassmorphism Player */}
@@ -217,3 +290,4 @@ export default function App() {
     </div>
   );
 }
+

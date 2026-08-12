@@ -15,7 +15,7 @@ export interface CassetteTape {
   era: string;
   genre: MusicGenre;
   releaseYear: number;
-  brand: 'Super Cassettes (T-Series)' | 'TDK D-90' | 'Goldstar Chrome' | 'Sony HF-90' | 'Maxell XL-II';
+  brand: string;
   shellColor: 'clear' | 'gold' | 'black' | 'blue' | 'red';
   sideA: string[];
   sideB: string[];
